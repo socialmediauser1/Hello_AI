@@ -5,7 +5,7 @@
 
 Setup:
 
-###1. Get an API Key
+### 1. Get an API Key
 
 **For OpenRouter (Recommended):**
 1. Go to [OpenRouter.ai](https://openrouter.ai/)
