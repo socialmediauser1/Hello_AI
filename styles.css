@@ -25,6 +25,7 @@ body {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   min-height: 100vh;
   color: var(--text-primary);
+  overflow-x: hidden;
 }
 
 .chat-container {
@@ -82,11 +83,18 @@ body {
 .chat-messages {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: var(--spacing);
   display: flex;
   flex-direction: column;
   gap: var(--spacing);
   background: var(--surface);
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.chat-messages::-webkit-scrollbar {
+  display: none;
 }
 
 .message {
@@ -272,6 +280,7 @@ body {
   .chat-container {
     height: 100vh;
     border-radius: 0;
+    margin: 0;
   }
   
   .message {

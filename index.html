@@ -45,7 +45,6 @@
 
   <script>
     const BACKEND_URL = 'https://hello-ai-2bnw.onrender.com';
-
     const btn = document.getElementById('send');
     const promptEl = document.getElementById('prompt');
     const chatMessages = document.getElementById('chatMessages');
@@ -98,7 +97,6 @@
       addMessage(prompt, true);
       promptEl.value = '';
       promptEl.style.height = 'auto';
-
       btn.disabled = true;
       const typingElement = addTypingIndicator();
 
