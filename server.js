@@ -8,7 +8,10 @@ import { fileURLToPath } from 'url';
 dotenv.config();
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: ['https://socialmediauser1.github.io', 'http://localhost:3000'],
+  credentials: true
+}));
 app.use(express.json());
 
 const __filename = fileURLToPath(import.meta.url);
