@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hello AI — Chat</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="chat-container">
+    <div class="chat-header">
+      <div class="header-content">
+        <div class="ai-avatar">🤖</div>
+        <div class="header-info">
+          <h1>Hello AI</h1>
+          <p class="status">Online</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="chat-messages" id="chatMessages">
+      <div class="message ai-message">
+        <div class="message-avatar">🤖</div>
+        <div class="message-content">
+          <p>Hello! I'm your AI assistant. How can I help you today?</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="chat-input-container">
+      <div class="input-wrapper">
+        <textarea id="prompt" placeholder="Type your message here..." rows="1"></textarea>
+        <button id="send" class="send-button">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22,2 15,22 11,13 2,9"></polygon>
+          </svg>
+        </button>
+      </div>
+      <div class="input-footer">
+        <small class="muted">Press Enter to send • Shift+Enter for new line</small>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const BACKEND_URL = '';
+
+    const btn = document.getElementById('send');
+    const promptEl = document.getElementById('prompt');
+    const chatMessages = document.getElementById('chatMessages');
+
+    function addMessage(content, isUser = false) {
+      const messageDiv = document.createElement('div');
+      messageDiv.className = `message ${isUser ? 'user-message' : 'ai-message'}`;
+      const avatar = document.createElement('div');
+      avatar.className = 'message-avatar';
+      avatar.textContent = isUser ? '👤' : '🤖';
+      const messageContent = document.createElement('div');
+      messageContent.className = 'message-content';
+      const p = document.createElement('p');
+      p.textContent = content;
+      messageContent.appendChild(p);
+      messageDiv.appendChild(avatar);
+      messageDiv.appendChild(messageContent);
+      chatMessages.appendChild(messageDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+      return messageDiv;
+    }
+
+    function addTypingIndicator() {
+      const messageDiv = document.createElement('div');
+      messageDiv.className = 'message ai-message typing-message';
+      const avatar = document.createElement('div');
+      avatar.className = 'message-avatar';
+      avatar.textContent = '🤖';
+      const messageContent = document.createElement('div');
+      messageContent.className = 'message-content';
+      const typingDiv = document.createElement('div');
+      typingDiv.className = 'typing-indicator';
+      typingDiv.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+      messageContent.appendChild(typingDiv);
+      messageDiv.appendChild(avatar);
+      messageDiv.appendChild(messageContent);
+      chatMessages.appendChild(messageDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+      return messageDiv;
+    }
+
+    function removeTypingIndicator(el) {
+      if (el && el.parentNode) el.parentNode.removeChild(el);
+    }
+
+    async function ask() {
+      const prompt = promptEl.value.trim();
+      if (!prompt) return;
+
+      addMessage(prompt, true);
+      promptEl.value = '';
+      promptEl.style.height = 'auto';
+
+      btn.disabled = true;
+      const typingElement = addTypingIndicator();
+
+      try {
+        const base = BACKEND_URL || '';
+        const res = await fetch(`${base}/api/chat`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt })
+        });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+        removeTypingIndicator(typingElement);
+        addMessage(data.reply || '(no reply)');
+      } catch (err) {
+        removeTypingIndicator(typingElement);
+        addMessage('Error: ' + err.message + '\n(Check server URL & server logs.)');
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    promptEl.addEventListener('input', function () {
+      this.style.height = 'auto';
+      this.style.height = Math.min(this.scrollHeight, 80) + 'px';
+    });
+
+    btn.addEventListener('click', ask);
+    promptEl.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) { 
+        e.preventDefault(); 
+        ask(); 
+      }
+    });
+
+    promptEl.focus();
+  </script>
+</body>
+</html>
